@@ -1,0 +1,21 @@
+Go through this link for performance checkup:- https://www.tensorflow.org/lite/performance/post_training_quantization
+
+Commands to convert to tflite model:-
+
+1. python export_tflite_ssd_graph.py --pipeline_config_path=mobile_data/ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=mobile_training/model.ckpt-100000 --output_directory=mobile_training/tflite/ --add_postprocessing_op=true
+
+2. for integer quantized model
+tflite_convert --graph_def_file=mobile_training/tflite/tflite_graph.pb --output_file=mobile_training/tflite/model.tflite --	       input_shapes=1,300,300,3 --input_arrays=normalized_input_image_tensor --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' --inference_type=QUANTIZED_UINT8 --mean_values=128 --std_dev_values=128 --allow_custom_ops --default_ranges_min=0 --default_ranges_max=255
+
+3. for float model
+tflite_convert --graph_def_file=mask_training/tflite_models/tflite_graph.pb --output_file=mask_training/tflite_models/float_model.tflite --input_shapes=1,300,300,3 --input_arrays=normalized_input_image_tensor --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' --inference_type='FLOAT' --allow_custom_ops
+
+tflite_convert --graph_def_file=door_training2/tflite/tflite_graph.pb --output_file=door_training2/float_model.tflite --input_shapes=1,300,300,3 --input_arrays=normalized_input_image_tensor --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' --inference_type=FLOAT --allow_custom_ops
+
+NOTE: Sometime output_arrays argumnets don't require ' ' so remove them and make comma separated only.
+    For example:- tflite_convert --graph_def_file=mask_training_quant/tflite/tflite_graph.pb --output_file=mask_training_quant/tflite/float_model.tflite --input_shapes=1,300,300,3 --input_arrays=normalized_input_image_tensor --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3 --inference_type=FLOAT --allow_custom_ops
+
+4. For setting path:
+set PYTHONPATH=D:\tensorflow\models;D:\tensorflow\models\research;D:\tensorflow\models\research\slim
+
+set PATH=%PYTHONPATH;%PATH%
